@@ -8,17 +8,13 @@ extern "C"
 	NJS_TEXLIST AL_OBJECT_DC_TEXLIST = { arrayptrandlength(AL_OBJECT_DC_TEXNAME) };
 
 	ChaoItemStats GenericStats = { 0,0,0,0,0,0,40,0 };
-	struct ItemChance
-	{
-		Sint8 item;
-		Sint8 chance;
-	};
+
 	int EnergyFruitID;
 	int PeaceFruitID;
 
 	int (*RegisterChaoFruit)(NJS_OBJECT* model, NJS_TEXLIST* texlist, ChaoItemStats* stats, void* attrib, void* Func, const char* name, const char* description);
 	void (*RegisterDataFunc)(void* ptr);
-	void (*RegisterBlackMarketRareFruit)(ItemChance* chance);
+	void (*RegisterBlackMarketRareFruit)(int ID, int chance);
 	void (*RegisterChaoTexlistLoad)(const char* name, NJS_TEXLIST* load);
 
 	void __cdecl EnergyFruitFunc(ChaoData* data, ObjectMaster* fruit)
@@ -87,17 +83,16 @@ extern "C"
 
 		EnergyFruitID = RegisterChaoFruit(&object_00103880, &AL_OBJECT_DC_TEXLIST, &GenericStats, &EnergyFruit, EnergyFruitFunc, EnergyFruitStr, EnergyFruitDesc);
 		PeaceFruitID = RegisterChaoFruit(&object_00104BA8, &AL_OBJECT_DC_TEXLIST, &GenericStats, &PeaceFruit, PeaceFruitFunc, PeaceFruitStr, PeaceFruitDesc);
-		ItemChance eFruitChance = { EnergyFruitID, 50 };
-		ItemChance pFruitChance = { PeaceFruitID, 50 };
-		RegisterBlackMarketRareFruit(&eFruitChance);
-		RegisterBlackMarketRareFruit(&pFruitChance);
+
+		RegisterBlackMarketRareFruit(EnergyFruitID, 50);
+		RegisterBlackMarketRareFruit(PeaceFruitID,50);
 	}
 	__declspec(dllexport) void Init()
 	{
 		HMODULE h = GetModuleHandle(L"CWE");
 		RegisterChaoFruit = (int (*)(NJS_OBJECT * model, NJS_TEXLIST * texlist, ChaoItemStats * stats, void* attrib, void*, const char*, const char*))GetProcAddress(h, "RegisterChaoFruit");
 		RegisterDataFunc = (void (*)(void* ptr))GetProcAddress(h, "RegisterDataFunc");
-		RegisterBlackMarketRareFruit = (void (*)(ItemChance * chance))GetProcAddress(h, "RegisterBlackMarketRareFruit");
+		RegisterBlackMarketRareFruit = (void (*)(int ID, int chance))GetProcAddress(h, "RegisterBlackMarketRareFruit");
 		RegisterChaoTexlistLoad = (void (*)(const char* name, NJS_TEXLIST * load))GetProcAddress(h, "RegisterChaoTexlistLoad");
 			
 		RegisterDataFunc(CWELoad);
